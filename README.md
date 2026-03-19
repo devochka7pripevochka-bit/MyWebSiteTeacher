@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Educational Worksheets Shop</title>
+    <style>
+        /* --- General Styles --- */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+
+        header {
+            background-color: #4a90e2;
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        header h1 { margin: 0; }
+        header p { margin-top: 10px; opacity: 0.9; }
+
+        /* --- Product Grid --- */
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+        }
+
+        /* --- Product Card --- */
+        .card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-image {
+            width: 100%;
+            height: 200px;
+            background-color: #ddd;
+            object-fit: cover;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-weight: bold;
+        }
+
+        .card-body {
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            margin: 0 0 10px 0;
+            color: #2c3e50;
+        }
+
+        .card-desc {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 15px;
+            flex-grow: 1;
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: auto;
+            border-top: 1px solid #eee;
+            padding-top: 15px;
+        }
+
+        .price {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #4a90e2;
+        }
+
+        .btn-view {
+            background-color: #4a90e2;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-view:hover {
+            background-color: #357abd;
+        }
+
+        /* --- Modal Styles --- */
+        .modal-overlay {
+            display: none; /* Hidden by default */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            width: 90%;
+            max-width: 800px;
+            border-radius: 12px;
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 2rem;
+            cursor: pointer;
+            color: #aaa;
+            z-index: 10;
+        }
+
+        .close-btn:hover { color: #333; }
+
+        /* Modal Layout */
+        .modal-body {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .modal-left {
+            flex: 1;
+            min-width: 300px;
+            padding: 20px;
+            border-right: 1px solid #eee;
+        }
+
+        .modal-right {
+            flex: 1;
+            min-width: 300px;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Carousel */
+        .carousel-container {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            background-color: #f0f0f0;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .carousel-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .carousel-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0,0,0,0.5);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 18px;
+            border-radius: 50%;
+        }
+
+        .prev { left: 10px; }
+        .next { right: 10px; }
+
+        .modal-title { font-size: 1.8rem; margin-bottom: 10px; }
+        .modal-price { font-size: 1.5rem; color: #4a90e2; font-weight: bold; margin-bottom: 20px; }
+        .modal-desc { line-height: 1.6; color: #555; margin-bottom: 30px; }
+
+        .btn-buy-large {
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            padding: 15px;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: auto;
+        }
+        .btn-buy-large:hover { background-color: #219150; }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .modal-body { flex-direction: column; }
+            .modal-left { border-right: none; border-bottom: 1px solid #eee; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Disgraphia Prevention Worksheets</h1>
+        <p>English Learning Materials for Kids</p>
+    </header>
+
+    <div class="container">
+        <div class="product-grid" id="productGrid">
+            <!-- Products will be inserted here by JavaScript -->
+        </div>
+    </div>
+
+    <!-- Modal Structure -->
+    <div class="modal-overlay" id="productModal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            
+            <div class="modal-body">
+                <!-- Left Side: Carousel -->
+                <div class="modal-left">
+                    <div class="carousel-container">
+                        <button class="carousel-btn prev" onclick="changeSlide(-1)">&#10094;</button>
+                        <img src="" alt="Product Image" class="carousel-img" id="modalImage">
+                        <button class="carousel-btn next" onclick="changeSlide(1)">&#10095;</button>
+                    </div>
+                </div>
+
+                <!-- Right Side: Details -->
+                <div class="modal-right">
+                    <h2 class="modal-title" id="modalTitle">Product Title</h2>
+                    <div class="modal-price" id="modalPrice">0 RUB</div>
+                    <p class="modal-desc" id="modalDesc">Description goes here...</p>
+                    <button class="btn-buy-large" onclick="alert('Proceeding to payment gateway...')">Buy Now</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Product Data ---
+        // Replace image placeholders with your real image URLs later
+ const products = [
+    {
+        id: 1,
+        title: "Numbers 1-12 Worksheets",
+        price: "400 RUB",
+        shortDesc: "22 sheets for dysgraphia prevention.",
+        fullDesc: "A comprehensive set of 22 worksheets designed to help children master numbers 1-12. These activities focus on handwriting precision and visual memory, specifically tailored for the prevention and correction of dysgraphia.",
+        images: [
+            "images/numbers1.PNG"
+        ]
+    },
+    {
+        id: 2,
+        title: "Numbers 13-90 Worksheets",
+        price: "400 RUB",
+        shortDesc: "18 sheets for dysgraphia prevention.",
+        fullDesc: "Continue the learning journey with numbers 13 through 90. This set includes 18 specialized sheets that challenge the student to write larger numbers correctly, improving fine motor skills and number recognition.",
+        images: [
+            "images/numbers2.PNG"
+        ]
+    },
+    {
+        id: 3,
+        title: "Colours Worksheets",
+        price: "250 RUB",
+        shortDesc: "12 sheets for dysgraphia prevention.",
+        fullDesc: "A vibrant set of 12 worksheets focusing on color recognition and vocabulary. These exercises are designed to be engaging while reinforcing correct letter formation and color association for dysgraphia correction.",
+        images: [
+            "images/colours.PNG"
+        ]
+    },
+    {
+        id: 4,
+        title: "Days of the Week Worksheets",
+        price: "250 RUB",
+        shortDesc: "11 sheets for dysgraphia prevention.",
+        fullDesc: "Master the days of the week with this 11-sheet set. These worksheets combine calendar skills with handwriting practice, helping students memorize the sequence of days while correcting writing mechanics.",
+        images: [
+            "images/days.PNG"
+        ]
+    }
+];
+
+        // --- Render Products to Grid ---
+        const grid = document.getElementById('productGrid');
+
+        products.forEach(product => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `
+                <div class="card-image">
+                    <img src="${product.images[0]}" alt="${product.title}" style="width:100%; height:100%; object-fit:cover;">
+                </div>
+                <div class="card-body">
+                    <h3 class="card-title">${product.title}</h3>
+                    <p class="card-desc">${product.shortDesc}</p>
+                    <div class="card-footer">
+                        <span class="price">${product.price}</span>
+                        <button class="btn-view" onclick="openModal(${product.id})">View Details</button>
+                    </div>
+                </div>
+            `;
+            grid.appendChild(card);
+        });
+
+        // --- Modal Logic ---
+        const modal = document.getElementById('productModal');
+        const modalImg = document.getElementById('modalImage');
+        let currentSlideIndex = 0;
+        let currentProductImages = [];
+
+        function openModal(id) {
+            const product = products.find(p => p.id === id);
+            if (!product) return;
+
+            // Populate Data
+            document.getElementById('modalTitle').innerText = product.title;
+            document.getElementById('modalPrice').innerText = product.price;
+            document.getElementById('modalDesc').innerText = product.fullDesc;
+            
+            // Setup Carousel
+            currentProductImages = product.images;
+            currentSlideIndex = 0;
+            updateCarousel();
+
+            // Show Modal
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden'; // Prevent scrolling background
+        }
+
+        function closeModal() {
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto'; // Restore scrolling
+        }
+
+        // Close modal if clicking outside the content box
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+
+        // --- Carousel Logic ---
+        function changeSlide(direction) {
+            currentSlideIndex += direction;
+            
+            // Loop around
+            if (currentSlideIndex >= currentProductImages.length) {
+                currentSlideIndex = 0;
+            } else if (currentSlideIndex < 0) {
+                currentSlideIndex = currentProductImages.length - 1;
+            }
+            
+            updateCarousel();
+        }
+
+        function updateCarousel() {
+            modalImg.src = currentProductImages[currentSlideIndex];
+        }
+
+    </script>
+</body>
+</html>
